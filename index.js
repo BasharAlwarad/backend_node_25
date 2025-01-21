@@ -1,26 +1,9 @@
 import { createServer } from 'http';
-import pkg from 'pg';
 import dotenv from 'dotenv';
+import queryDB from './db.js';
 
 dotenv.config();
-
-const { Pool } = pkg;
 const PORT = process.env.PORT || 3000;
-const NEON = process.env.NEON;
-
-// Database connection
-const pool = new Pool({ connectionString: NEON });
-
-// Query helper
-const queryDB = async (query, params = []) => {
-  const client = await pool.connect();
-  try {
-    const result = await client.query(query, params);
-    return result.rows;
-  } finally {
-    client.release();
-  }
-};
 
 // Create server
 const server = createServer(async (req, res) => {
