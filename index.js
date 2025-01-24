@@ -1,6 +1,7 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import queryDB from './db.js';
+import cors from 'cors';
 
 dotenv.config();
 const PORT = process.env.PORT || 3000;
@@ -8,6 +9,7 @@ const app = express();
 
 // Middleware to parse JSON bodies
 app.use(express.json());
+app.use(cors());
 
 // Home route
 app.get('/', (req, res) => {
