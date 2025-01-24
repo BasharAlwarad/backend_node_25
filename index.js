@@ -1,15 +1,26 @@
 import express from 'express';
 import dotenv from 'dotenv';
-import queryDB from './db.js';
 import cors from 'cors';
+import sequelize from './db.js';
+import User from './models/User.js';
 
 dotenv.config();
 const PORT = process.env.PORT || 3000;
 const app = express();
 
-// Middleware to parse JSON bodies
+// Middleware
 app.use(express.json());
 app.use(cors());
+
+// Sync database
+(async () => {
+  try {
+    await sequelize.sync(); // Ensure the database structure matches the model
+    console.log('Database synced.');
+  } catch (error) {
+    console.error('Error syncing database:', error);
+  }
+})();
 
 // Home route
 app.get('/', (req, res) => {
@@ -18,25 +29,37 @@ app.get('/', (req, res) => {
 
 // Get all users
 app.get('/api/v1/users', async (req, res) => {
-  const users = await queryDB('SELECT * FROM users');
-  res.json(users);
+  try {
+    const users = await User.findAll();
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
 // Get user by ID
 app.get('/api/v1/users/:id', async (req, res) => {
   const { id } = req.params;
-  const user = await queryDB('SELECT * FROM users WHERE id = $1', [id]);
-  res.json(user[0]);
+  try {
+    const user = await User.findByPk(id);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
 // Create a new user
 app.post('/api/v1/users', async (req, res) => {
   const { first_name, last_name, age } = req.body;
-  const newUser = await queryDB(
-    'INSERT INTO users (first_name, last_name, age) VALUES ($1, $2, $3) RETURNING *',
-    [first_name, last_name, age]
-  );
-  res.status(201).json(newUser[0]);
+  try {
+    const newUser = await User.create({ first_name, last_name, age });
+    res.status(201).json(newUser);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
 });
 
 // Update user by ID
@@ -44,23 +67,34 @@ app.put('/api/v1/users/:id', async (req, res) => {
   const { id } = req.params;
   const { first_name, last_name, age } = req.body;
 
-  const updatedUser = await queryDB(
-    'UPDATE users SET first_name = $1, last_name = $2, age = $3 WHERE id = $4 RETURNING *',
-    [first_name, last_name, age, id]
-  );
+  try {
+    const user = await User.findByPk(id);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
 
-  res.json(updatedUser[0]);
+    await user.update({ first_name, last_name, age });
+    res.json(user);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
 });
 
 // Delete user by ID
 app.delete('/api/v1/users/:id', async (req, res) => {
   const { id } = req.params;
 
-  const deletedUser = await queryDB(
-    'DELETE FROM users WHERE id = $1 RETURNING *',
-    [id]
-  );
-  res.json(deletedUser[0]);
+  try {
+    const user = await User.findByPk(id);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    await user.destroy();
+    res.json({ message: 'User deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
 // Default 404 handler
@@ -69,4 +103,4 @@ app.use((req, res) => {
 });
 
 // Start server
-app.listen(PORT, () => console.log(`Server running on ${PORT}`));
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
