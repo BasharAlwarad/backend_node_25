@@ -1,7 +1,6 @@
 import queryDB from '../db.js';
 
 export const getAllUsers = async (req, res) => {
-  console.log(123);
   const users = await queryDB('SELECT * FROM users');
   res.json(users);
 };

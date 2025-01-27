@@ -1,14 +1,7 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
-
-import {
-  getAllUsers,
-  getUserById,
-  createUser,
-  updateUser,
-  deleteUser,
-} from './controllers/userController.js';
+import userRouter from './routers/userRouter.js';
 
 dotenv.config();
 const PORT = process.env.PORT || 3000;
@@ -23,20 +16,7 @@ app.get('/', (req, res) => {
   res.json({ message: 'Server is running!' });
 });
 
-// Get all users
-app.get('/api/v1/users', getAllUsers);
-
-// Get user by ID
-app.get('/api/v1/users/:id', getUserById);
-
-// Create a new user
-app.post('/api/v1/users', createUser);
-
-// Update user by ID
-app.put('/api/v1/users/:id', updateUser);
-
-// Delete user by ID
-app.delete('/api/v1/users/:id', deleteUser);
+app.use(`/api/v1/users`, userRouter);
 
 // Default 404 handler
 app.use((req, res) => {
