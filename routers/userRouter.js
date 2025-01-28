@@ -1,8 +1,8 @@
 import { Router } from 'express';
 
 import {
-  getAllUsers,
-  getUserById,
+  getUsers,
+  getOneUser,
   createUser,
   updateUser,
   deleteUser,
@@ -11,10 +11,12 @@ import {
 const userRouter = Router();
 
 // Get all users
-userRouter.get('/', getAllUsers);
+// http://localhost:3000/api/v1/users
+userRouter.get('/', getUsers);
 
 // Get user by ID
-userRouter.get('/:id', getUserById);
+// http://localhost:3000/api/v1/users/1
+userRouter.get('/:id', getOneUser);
 
 // Create a new user
 userRouter.post('/', createUser);
