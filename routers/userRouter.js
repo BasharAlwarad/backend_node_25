@@ -8,11 +8,16 @@ import {
   deleteUser,
 } from '../controllers/userController.js';
 
+const showDate = (req, res, next) => {
+  console.log('Date:', new Date());
+  next();
+};
+
 const userRouter = Router();
 
 // Get all users
 // http://localhost:3000/api/v1/users
-userRouter.get('/', getUsers);
+userRouter.get('/', showDate, getUsers);
 
 // Get user by ID
 // http://localhost:3000/api/v1/users/1
