@@ -1,5 +1,4 @@
 import { Router } from 'express';
-
 import {
   getUsers,
   getOneUser,
@@ -7,27 +6,21 @@ import {
   updateUser,
   deleteUser,
 } from '../controllers/userController.js';
-
-const showDate = (req, res, next) => {
-  console.log('Date:', new Date());
-  next();
-};
+import { validateUser } from '../validators/userValidator.js';
 
 const userRouter = Router();
 
 // Get all users
-// http://localhost:3000/api/v1/users
-userRouter.get('/', showDate, getUsers);
+userRouter.get('/', getUsers);
 
 // Get user by ID
-// http://localhost:3000/api/v1/users/1
 userRouter.get('/:id', getOneUser);
 
-// Create a new user
-userRouter.post('/', createUser);
+// Create a new user with validation
+userRouter.post('/', validateUser, createUser);
 
-// Update user by ID
-userRouter.put('/:id', updateUser);
+// Update user by ID with validation
+userRouter.put('/:id', validateUser, updateUser);
 
 // Delete user by ID
 userRouter.delete('/:id', deleteUser);
