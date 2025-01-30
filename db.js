@@ -6,7 +6,7 @@ dotenv.config();
 const NEON = process.env.NEON;
 
 // Initialize Sequelize
-const sequelize = new Sequelize(NEON, {
+export const sequelize = new Sequelize(NEON, {
   dialect: 'postgres',
   logging: false,
 });
@@ -21,4 +21,11 @@ const sequelize = new Sequelize(NEON, {
   }
 })();
 
-export default sequelize;
+export const db = async () => {
+  try {
+    await sequelize.sync();
+    console.log('Database synced.');
+  } catch (error) {
+    console.error('Error syncing database:', error);
+  }
+};
