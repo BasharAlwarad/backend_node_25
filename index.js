@@ -2,6 +2,7 @@ import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import sequelize from './db.js';
+import fileUploader from './middlewares/fileUploader.js';
 
 import userRouter from './routers/userRouter.js';
 import ordersRouter from './routers/ordersRouter.js';
@@ -13,6 +14,18 @@ const app = express();
 // Middleware
 app.use(express.json());
 app.use(cors());
+
+// Setup multer for file upload
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/');
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + '-' + file.originalname);
+  },
+});
+
+const upload = multer({ storage });
 
 // Sync database
 (async () => {
@@ -29,6 +42,14 @@ app.get('/', (req, res) => {
   res.json({ message: 'Server is running!' });
 });
 
+// File upload route
+app.post('/api/v1/file-upload', fileUploader.single('image'), (req, res) => {
+  if (!req.file) throw new ErrorResponse('Please upload a file', 400);
+  return res.status(200).json({
+    location: `${req.protocol}://${req.get('host')}/files/${req.file.filename}`,
+  });
+});
+
 // http://localhost:3000/api/v1/users
 app.use(`/api/v1/users`, userRouter);
 
@@ -42,4 +63,3 @@ app.use((req, res) => {
 
 // Start server
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-// http://localhost:3000
