@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import sequelize from './db.js';
 import fileUploader from './middlewares/fileUploader.js';
+import multer from 'multer';
 
 import userRouter from './routers/userRouter.js';
 import ordersRouter from './routers/ordersRouter.js';
@@ -43,8 +44,23 @@ app.get('/', (req, res) => {
 });
 
 // File upload route
+// app.post('/api/v1/file-upload', fileUploader.single('image'), (req, res) => {
+//   // if (!req.file) throw new ErrorResponse('Please upload a file', 400);
+//   return res.status(200).json({
+//     location: `${req.protocol}://${req.get('host')}/files/${req.file.filename}`,
+//   });
+// });
+
 app.post('/api/v1/file-upload', fileUploader.single('image'), (req, res) => {
-  if (!req.file) throw new ErrorResponse('Please upload a file', 400);
+  if (!req.file) {
+    return res
+      .status(400)
+      .json({
+        error:
+          'File upload failed. Ensure the file is an image and within size limits.',
+      });
+  }
+
   return res.status(200).json({
     location: `${req.protocol}://${req.get('host')}/files/${req.file.filename}`,
   });
