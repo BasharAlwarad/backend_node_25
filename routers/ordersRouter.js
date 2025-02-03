@@ -1,10 +1,10 @@
 import { Router } from 'express';
 import {
   getOrders,
-  getOneOrders,
-  createOrders,
-  updateOrders,
-  deleteOrders,
+  getOneOrder,
+  createOrder,
+  updateOrder,
+  deleteOrder,
 } from '../controllers/orderControllers.js';
 
 const ordersRouter = Router();
@@ -13,15 +13,15 @@ const ordersRouter = Router();
 ordersRouter.get('/', getOrders);
 
 // Get order by ID
-ordersRouter.get('/:id', getOneOrders);
+ordersRouter.get('/:id', getOneOrder);
 
 // Create a new order
-ordersRouter.post('/', createOrders);
+ordersRouter.post('/', createOrder);
 
 // Update order by ID
-ordersRouter.put('/:id', updateOrders);
+ordersRouter.put('/:id', updateOrder);
 
 // Delete order by ID
-ordersRouter.delete('/:id', deleteOrders);
+ordersRouter.delete('/:id', deleteOrder);
 
 export default ordersRouter;

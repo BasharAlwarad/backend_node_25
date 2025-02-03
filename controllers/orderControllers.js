@@ -1,62 +1,85 @@
-import Orders from '../models/Orders.js';
+import { db } from '../db.js';
+import { ObjectId } from 'mongodb';
+import { CustomError } from '../utils/errorHandler.js';
 
-export const getOrders = async (req, res) => {
+export const getOrders = async (req, res, next) => {
   try {
-    const orders = await Orders.findAll();
-    res.json(orders);
+    const ordersCollection = db.collection('orders');
+    const orders = await ordersCollection.find().toArray();
+    res.json({ success: true, data: orders });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    next(new CustomError('Failed to fetch orders', 500));
   }
 };
-export const getOneOrders = async (req, res) => {
+
+export const getOneOrder = async (req, res, next) => {
   const { id } = req.params;
+  if (!ObjectId.isValid(id)) {
+    return next(new CustomError('Invalid order ID format', 400));
+  }
   try {
-    const order = await Orders.findByPk(id);
+    const ordersCollection = db.collection('orders');
+    const order = await ordersCollection.findOne({ _id: new ObjectId(id) });
     if (!order) {
-      return res.status(404).json({ error: 'Order not found' });
+      return next(new CustomError('Order not found', 404));
     }
-    res.json(order);
+    res.json({ success: true, data: order });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    next(new CustomError('Failed to fetch order', 500));
   }
 };
-export const createOrders = async (req, res) => {
+
+export const createOrder = async (req, res, next) => {
   const { price, date, user_id } = req.body;
   try {
-    const newOrder = await Orders.create({ price, date, user_id });
-    res.status(201).json(newOrder);
+    const ordersCollection = db.collection('orders');
+    const result = await ordersCollection.insertOne({ price, date, user_id });
+    res.status(201).json({
+      success: true,
+      data: { id: result.insertedId, price, date, user_id },
+    });
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    next(new CustomError('Failed to create order', 400));
   }
 };
-export const updateOrders = async (req, res) => {
+
+export const updateOrder = async (req, res, next) => {
   const { id } = req.params;
   const { price, date, user_id } = req.body;
 
+  if (!ObjectId.isValid(id)) {
+    return next(new CustomError('Invalid order ID format', 400));
+  }
   try {
-    const order = await Orders.findByPk(id);
+    const ordersCollection = db.collection('orders');
+    const order = await ordersCollection.findOne({ _id: new ObjectId(id) });
     if (!order) {
-      return res.status(404).json({ error: 'Order not found' });
+      return next(new CustomError('Order not found', 404));
     }
-
-    await order.update({ price, date, user_id });
-    res.json(order);
+    const result = await ordersCollection.findOneAndUpdate(
+      { _id: new ObjectId(id) },
+      { $set: { price, date, user_id } },
+      { returnDocument: 'after' }
+    );
+    res.json({ success: true, data: result.value });
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    next(new CustomError('Failed to update order', 400));
   }
 };
-export const deleteOrders = async (req, res) => {
+
+export const deleteOrder = async (req, res, next) => {
   const { id } = req.params;
-
+  if (!ObjectId.isValid(id)) {
+    return next(new CustomError('Invalid order ID format', 400));
+  }
   try {
-    const order = await Orders.findByPk(id);
-    if (!order) {
-      return res.status(404).json({ error: 'Order not found' });
+    const ordersCollection = db.collection('orders');
+    const result = await ordersCollection.deleteOne({ _id: new ObjectId(id) });
+    if (result.deletedCount === 0) {
+      return next(new CustomError('Order not found', 404));
     }
-
-    await order.destroy();
-    res.json({ message: 'Order deleted successfully' });
+    res.json({ success: true, message: 'Order deleted successfully' });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    next(new CustomError('Failed to delete order', 500));
   }
 };

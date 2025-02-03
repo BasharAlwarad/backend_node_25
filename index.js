@@ -3,8 +3,9 @@ import { config } from 'dotenv';
 import cors from 'cors';
 import { client } from './db.js';
 
+import { errorHandler } from './utils/errorHandler.js';
 import userRouter from './routers/userRouter.js';
-// import ordersRouter from './routers/ordersRouter.js';
+import ordersRouter from './routers/ordersRouter.js';
 
 config();
 
@@ -18,17 +19,21 @@ app.get('/', (req, res) => {
 });
 
 app.use(`/api/v1/users`, userRouter);
-// app.use(`/api/v1/orders`, ordersRouter);
+app.use(`/api/v1/orders`, ordersRouter);
 
 app.get('*', (req, res) => {
   res.status(500).send('Server error!');
 });
 
+app.use(errorHandler);
+
 client
   .connect()
   .then(() => {
     app.listen(PORT, () => {
-      console.log(`Server is running at ${PORT}`);
+      console.log(
+        `Server is running in ${process.env.NODE_ENV} mode at ${PORT}`
+      );
     });
   })
   .catch((err) => {
