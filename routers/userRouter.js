@@ -5,8 +5,10 @@ import {
   createUser,
   updateUser,
   deleteUser,
+  addBookToUser,
+  updateBookInUserList,
+  deleteBookFromUserList,
 } from '../controllers/userController.js';
-import { validateUser } from '../validators/userValidator.js';
 
 const userRouter = Router();
 
@@ -24,5 +26,14 @@ userRouter.put('/:id', updateUser);
 
 // Delete user by ID
 userRouter.delete('/:id', deleteUser);
+
+// Add a book to the user's reading list
+userRouter.post('/:id/books', addBookToUser);
+
+// Update a book in the user's reading list
+userRouter.put('/:id/books/:bookId', updateBookInUserList);
+
+// Delete a book from the user's reading list
+userRouter.delete('/:id/books/:bookId', deleteBookFromUserList);
 
 export default userRouter;

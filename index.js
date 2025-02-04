@@ -1,12 +1,11 @@
 import express, { json } from 'express';
 import { config } from 'dotenv';
 import cors from 'cors';
-// import { client } from './db.js';
 import './db.js';
 
 import { errorHandler } from './utils/errorHandler.js';
 import userRouter from './routers/userRouter.js';
-import ordersRouter from './routers/ordersRouter.js';
+import bookRouter from './routers/bookRouters.js';
 
 config();
 
@@ -20,7 +19,7 @@ app.get('/', (req, res) => {
 });
 
 app.use(`/api/v1/users`, userRouter);
-app.use(`/api/v1/orders`, ordersRouter);
+app.use(`/api/v1/books`, bookRouter);
 
 app.get('*', (req, res) => {
   res.status(500).send('Server error!');

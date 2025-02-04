@@ -1,49 +1,17 @@
 import mongoose from 'mongoose';
 
-const userSchema = new mongoose.Schema(
-  {
-    first_name: { type: String, required: true },
-    last_name: { type: String, required: true },
-    age: { type: Number, required: true },
-  },
-  {
-    timestamps: true,
-  }
-);
+const { Schema, model, Types } = mongoose;
 
-const User = mongoose.model('User', userSchema);
+const ReadingListSchema = new Schema({
+  bookRefId: { type: Types.ObjectId, ref: 'Book', required: true },
+  status: { type: String, enum: ['read', 'pending'], required: true },
+});
+
+const UserSchema = new Schema({
+  firstName: { type: String, required: true },
+  lastName: { type: String, required: true },
+  readingList: [ReadingListSchema],
+});
+
+const User = model('User', UserSchema);
 export default User;
-
-// import { DataTypes } from 'sequelize';
-// import { sequelize } from '../db.js';
-
-// const User = sequelize.define(
-//   'users',
-//   {
-//     id: {
-//       type: DataTypes.INTEGER,
-//       primaryKey: true,
-//       autoIncrement: true,
-//     },
-//     first_name: {
-//       type: DataTypes.STRING,
-//       allowNull: false,
-//     },
-//     last_name: {
-//       type: DataTypes.STRING,
-//       allowNull: false,
-//     },
-//     age: {
-//       type: DataTypes.INTEGER,
-//       allowNull: false,
-//     },
-//   },
-//   {
-//     tableName: 'users',
-//     timestamps: true,
-//     createdAt: 'created_at',
-//     updatedAt: 'updated_at',
-//   }
-// );
-
-// export default User;
