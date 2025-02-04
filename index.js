@@ -1,7 +1,8 @@
 import express, { json } from 'express';
 import { config } from 'dotenv';
 import cors from 'cors';
-import { client } from './db.js';
+// import { client } from './db.js';
+import './db.js';
 
 import { errorHandler } from './utils/errorHandler.js';
 import userRouter from './routers/userRouter.js';
@@ -27,15 +28,6 @@ app.get('*', (req, res) => {
 
 app.use(errorHandler);
 
-client
-  .connect()
-  .then(() => {
-    app.listen(PORT, () => {
-      console.log(
-        `Server is running in ${process.env.NODE_ENV} mode at ${PORT}`
-      );
-    });
-  })
-  .catch((err) => {
-    console.error('Failed to connect to MongoDB:', err);
-  });
+app.listen(PORT, () => {
+  console.log(`Server is running in ${process.env.NODE_ENV} mode at ${PORT}`);
+});

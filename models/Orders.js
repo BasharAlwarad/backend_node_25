@@ -1,32 +1,51 @@
-import { DataTypes } from 'sequelize';
-import { sequelize } from '../db.js';
+import mongoose from 'mongoose';
 
-const Orders = sequelize.define(
-  'orders',
+const orderSchema = new mongoose.Schema(
   {
-    id: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      autoIncrement: true,
-    },
-    price: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-    date: {
-      type: DataTypes.DATE,
-      allowNull: false,
-      defaultValue: DataTypes.NOW,
-    },
+    price: { type: Number, required: true },
     user_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
     },
   },
   {
-    tableName: 'orders',
-    timestamps: false,
+    timestamps: true,
   }
 );
 
-export default Orders;
+const Order = mongoose.model('Order', orderSchema);
+export default Order;
+
+// import { DataTypes } from 'sequelize';
+// import { sequelize } from '../db.js';
+
+// const Orders = sequelize.define(
+//   'orders',
+//   {
+//     id: {
+//       type: DataTypes.INTEGER,
+//       primaryKey: true,
+//       autoIncrement: true,
+//     },
+//     price: {
+//       type: DataTypes.INTEGER,
+//       allowNull: false,
+//     },
+//     date: {
+//       type: DataTypes.DATE,
+//       allowNull: false,
+//       defaultValue: DataTypes.NOW,
+//     },
+//     user_id: {
+//       type: DataTypes.INTEGER,
+//       allowNull: false,
+//     },
+//   },
+//   {
+//     tableName: 'orders',
+//     timestamps: false,
+//   }
+// );
+
+// export default Orders;

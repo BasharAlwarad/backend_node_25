@@ -17,10 +17,10 @@ userRouter.get('/', getUsers);
 userRouter.get('/:id', getOneUser);
 
 // Create a new user with validation
-userRouter.post('/', validateUser, createUser);
+userRouter.post('/', createUser);
 
 // Update user by ID with validation
-userRouter.put('/:id', validateUser, updateUser);
+userRouter.put('/:id', updateUser);
 
 // Delete user by ID
 userRouter.delete('/:id', deleteUser);
